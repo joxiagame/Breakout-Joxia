@@ -13,11 +13,15 @@
   }
   html,body{ height:100%; }
   body{
-    background:#12203a; overflow:hidden; touch-action:none; color:var(--ink);
+    background:radial-gradient(120% 90% at 50% 0%, #16294a 0%, #0c1830 60%, #081020 100%);
+    overflow:hidden; touch-action:none; color:var(--ink);
     font-family:'Nunito',sans-serif; user-select:none; -webkit-user-select:none;
+    display:flex; align-items:center; justify-content:center;
   }
   ::selection{ background:rgba(244,81,30,.22); }
-  #game-container{ position:relative; width:100vw; height:100vh; height:100dvh; display:flex; justify-content:center; overflow:hidden; }
+  /* Zone de jeu verrouillée en portrait, centrée (marges sombres sur grand écran) */
+  #game-container{ position:relative; width:min(100vw, calc(100dvh * 0.52)); height:100dvh; overflow:hidden;
+    box-shadow:0 0 70px rgba(0,0,0,.55); }
   #c{ display:block; width:100%; height:100%; }
 
   /* HUD */
@@ -38,7 +42,7 @@
   #hud.hidden{ display:none; }
 
   /* back to hub */
-  #back-btn{ position:fixed; top:calc(env(safe-area-inset-top) + 10px); right:12px; z-index:200;
+  #back-btn{ position:absolute; top:calc(env(safe-area-inset-top) + 10px); right:12px; z-index:200;
     background:rgba(255,247,235,.94); border:1px solid rgba(244,81,30,.35); border-radius:12px; padding:7px 12px;
     color:var(--ink); font-weight:800; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:8px;
     box-shadow:0 4px 14px rgba(0,0,0,.3); text-decoration:none; }
@@ -75,7 +79,7 @@
   .go-score{ font-size:26px; color:var(--ink); font-weight:900; }
   .go-sub{ color:var(--ink-soft); font-weight:800; margin:2px 0 4px; }
   .go-coins{ color:var(--gold-text); font-weight:900; font-size:20px; margin:6px 0 22px; }
-  .coin-badge{ position:fixed; top:calc(env(safe-area-inset-top) + 10px); left:12px; background:rgba(255,247,235,.94);
+  .coin-badge{ position:absolute; top:calc(env(safe-area-inset-top) + 10px); left:12px; background:rgba(255,247,235,.94);
     border:1px solid rgba(255,255,255,.85); border-radius:30px; padding:7px 16px; font-size:17px; color:var(--gold-text);
     font-weight:900; box-shadow:0 4px 14px rgba(0,0,0,.25); z-index:25; }
 
@@ -122,7 +126,7 @@
     color:#fff; width:42px; height:42px; border-radius:50%; font-size:20px; font-weight:900; cursor:pointer; z-index:22;
     font-family:'Nunito',sans-serif; }
 
-  .notif{ position:fixed; top:70px; left:50%; transform:translateX(-50%); background:#fff; color:var(--ink);
+  .notif{ position:absolute; top:70px; left:50%; transform:translateX(-50%); background:#fff; color:var(--ink);
     padding:11px 24px; border-radius:30px; font-weight:800; font-size:14px; z-index:100; pointer-events:none;
     box-shadow:0 8px 24px rgba(0,0,0,.3); animation:na .3s ease; }
   @keyframes na{ from{ opacity:0; transform:translateX(-50%) translateY(-10px);} to{ opacity:1; transform:translateX(-50%) translateY(0);} }
@@ -132,10 +136,10 @@
 </head>
 <body>
 
-<a id="back-btn" href="https://joxiagame.github.io/Joxia-Games/">🏠 Quitter <span class="ptag" id="ptag"></span></a>
-
 <div id="game-container">
   <canvas id="c"></canvas>
+
+  <a id="back-btn" href="https://joxiagame.github.io/Joxia-Games/">🏠 Quitter <span class="ptag" id="ptag"></span></a>
 
   <div id="coin-badge" class="coin-badge" style="display:none;">🪙 <span id="coin-hud">0</span></div>
 
@@ -769,7 +773,7 @@ function closeShop(){ document.getElementById('shop-screen').classList.add('hidd
   if(shopReturn==='pause') document.getElementById('pause-screen').classList.remove('hidden');
   else drawBallPreview(); }
 
-function notif(m){ const n=document.createElement('div'); n.className='notif'; n.textContent=m; document.body.appendChild(n); setTimeout(()=>n.remove(),1800); }
+function notif(m){ const n=document.createElement('div'); n.className='notif'; n.textContent=m; document.getElementById('game-container').appendChild(n); setTimeout(()=>n.remove(),1800); }
 
 // ── entrées ──
 function pointerX(e){ const rect=cv.getBoundingClientRect(); const cx=(e.touches?e.touches[0].clientX:e.clientX); return (cx-rect.left); }
