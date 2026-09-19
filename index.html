@@ -277,9 +277,9 @@ function curTheme(){ return THEMES[Math.floor((level-1)/2)%THEMES.length]; }
 
 // ── boss ──
 const BOSS_TYPES=[
-  {name:'Le Cube',   emoji:'🟥', col:'#c0392b', col2:'#e74c3c', hp:28, speed:1.6, fireRate:120, spread:1},
+  {name:'Le Cube',   emoji:'🤖', col:'#c0392b', col2:'#e74c3c', hp:28, speed:1.6, fireRate:120, spread:1},
   {name:"L'Essaim",  emoji:'👾', col:'#6a1b9a', col2:'#9c27b0', hp:40, speed:2.2, fireRate:95,  spread:3},
-  {name:'Le Titan',  emoji:'🐲', col:'#1b5e20', col2:'#388e3c', hp:56, speed:2.6, fireRate:72,  spread:2},
+  {name:'Le Titan',  emoji:'👹', col:'#1b5e20', col2:'#388e3c', hp:56, speed:2.6, fireRate:72,  spread:2},
 ];
 function isBossLevel(){ return level%5===0; }
 function buildBoss(){
