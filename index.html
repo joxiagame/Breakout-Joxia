@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Brick Blast</title>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap');
   *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -704,7 +706,7 @@ function startGame(){ Snd.resume(); state='playing'; hideAll();
 function pauseGame(){ if(state!=='playing')return; state='paused'; document.getElementById('pause-screen').classList.remove('hidden'); }
 function resumeGame(){ if(state!=='paused')return; state='playing'; document.getElementById('pause-screen').classList.add('hidden'); }
 function gameOver(){ state='gameover'; Snd.over(); addShake(14);
-  if(score>highScore)highScore=score; save();
+  if(score>highScore)highScore=score; save(); saveScoreCloud(score);
   document.getElementById('go-score').textContent=score; document.getElementById('go-best').textContent=highScore;
   document.getElementById('go-level').textContent=level; document.getElementById('go-coins').textContent=coins;
   document.getElementById('hud').classList.add('hidden'); document.getElementById('back-btn').classList.remove('hidden');
@@ -808,6 +810,25 @@ mb.addEventListener('click',()=>{ mb.textContent=Snd.toggle()?'🔇':'🔊'; });
 const params=new URLSearchParams(location.search);
 const player=params.get('player')||localStorage.getItem('bbPlayer')||'Joueur';
 if(params.get('player'))localStorage.setItem('bbPlayer',params.get('player'));
+
+// ── classement Firebase (base commune Joxia) ──
+let bbDB=null, bbBestSaved=0;
+try{
+  const cfg={ apiKey:"AIzaSyCPecKQH6DURfYitjY4bXMeW0URLrcNnsI", authDomain:"joxiahub-2928b.firebaseapp.com",
+    databaseURL:"https://joxiahub-2928b-default-rtdb.europe-west1.firebasedatabase.app", projectId:"joxiahub-2928b",
+    storageBucket:"joxiahub-2928b.firebasestorage.app", messagingSenderId:"303698595695",
+    appId:"1:303698595695:web:5c99c2cb2a9ea88e36a29a" };
+  if(!firebase.apps.length) firebase.initializeApp(cfg); bbDB=firebase.database();
+}catch(e){ console.warn('Firebase indisponible', e); }
+function saveScoreCloud(sc){
+  if(!bbDB || !player || player==='Joueur' || sc<=0 || sc<=bbBestSaved) return;
+  bbBestSaved=sc; const path='games/BRICK_BLAST/scores';
+  bbDB.ref(path).orderByChild('name').equalTo(player).once('value',snap=>{
+    const v=snap.val();
+    if(v){ const k=Object.keys(v)[0]; if(Number(sc)>Number(v[k].score)) bbDB.ref(path+'/'+k).update({score:Number(sc),date:Date.now()}); }
+    else bbDB.ref(path).push({name:player,score:Number(sc),date:Date.now()});
+  });
+}
 document.getElementById('ptag').textContent=player;
 load(); resize(); showStart(); loop();
 </script>
